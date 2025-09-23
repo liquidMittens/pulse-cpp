@@ -57,6 +57,7 @@ namespace pulse
 
 		inline void invoke(const Args&... args);
 		inline void clear();
+		inline std::size_t count();
 
 
 	private:
@@ -85,6 +86,11 @@ namespace pulse
 	void Event<Args...>::clear() {
 		_listeners.clear();
 		_currentID = 0;
+	}
+
+	template<typename ...Args>
+	std::size_t Event<Args...>::count() {
+		return _listeners.size();
 	}
 
 	template<typename ...Args>

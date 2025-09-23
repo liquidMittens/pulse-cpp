@@ -26,5 +26,8 @@
     <ClInclude Include="include\pulse\event.hpp">
       <Filter>Header Files\pulse</Filter>
     </ClInclude>
+    <ClInclude Include="include\pulse\message_bus.hpp">
+      <Filter>Header Files\pulse</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -18,9 +18,13 @@ int main(int argc, char* argv[])
 {
 	std::cout << "Added Listener to helloStringEvent\n";
 	pulse::Event<std::string> helloStringEvent;
-	helloStringEvent.addListener(helloString);
+	pulse::Event<std::string>::EventConnection helloStringMethodConnection = helloStringEvent.addListener(helloString);
+	pulse::Event<std::string>::EventConnection helloStringLambdaConnection = helloStringEvent.addListener([](std::string s) { std::cout << std::format("This is from a lambda! It says: {}\n", s); });
 
-	std::cout << "Added Listener to helloIntEvent\n";
+	std::cout << "disconnect lambda connection\n";
+	helloStringLambdaConnection.disconnect();
+
+	std::cout << "Added Listener to helloIntEvent\n\n";
 	pulse::Event<int> helloIntEvent;
 	helloIntEvent.addListener(helloInt);
 

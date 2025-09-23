@@ -13,12 +13,15 @@ namespace pulse
 	template<typename ...Args>
 	class Event
 	{
+		using Func = std::function<void(Args...)>;
+
 	public:
 		class EventConnection
 		{
+		public:
 			friend Event;
 
-			inline void connect(Event* owner, int newID)
+			inline void connect(Event* owner, std::size_t newID)
 			{
 				_eventOwner = owner;
 				_id = newID;
@@ -31,22 +34,37 @@ namespace pulse
 				}
 			}
 
-			int _id;
-			Event* _eventOwner;
+			std::size_t _id = 0;
+			Event* _eventOwner = nullptr;
 		};
 
+		template<typename ...Args>
+		EventConnection addListener(Func fn) {
+			++_currentID;
+			EventConnection conn;
+			conn.connect(this, _currentID);
+			_listeners.emplace_back(_currentID, std::move(fn));
+			return conn;
+		}
 
-		EventConnection addListener(std::function<void(Args...)> fn);
-		inline void invoke(Args... args);
+		template<class F>
+		EventConnection addListener(F&& f) {
+			const std::size_t id = ++_currentID;
+			EventConnection c; c.connect(this, id);
+			_listeners.emplace_back(id, Func(std::forward<F>(f)));
+			return c;
+		}
+
+		inline void invoke(const Args&... args);
 		inline void clear();
 
 
 	private:
 
-		bool disconnectListener(int removeID);
+		bool disconnectListener(std::size_t removeID);
 
-		std::vector <std::pair<EventConnection, std::function<void(Args...)>>> _listeners;
-		int _currentID;
+		std::vector <std::pair<std::size_t, Func>> _listeners;
+		std::size_t _currentID = 0;
 	};
 
 	// IMPLEMENTATION
@@ -57,19 +75,10 @@ namespace pulse
 	/// <typeparam name="...Args"></typeparam>
 	/// <param name="...args"></param>
 	template<typename ...Args>
-	void Event<Args...>::invoke(Args... args) {
+	void Event<Args...>::invoke(const Args&... args) {
 		for (auto fn : _listeners) {
-			fn.second(std::forward<Args>(args)...);
+			fn.second(args...);
 		}
-	}
-
-	template<typename ...Args>
-	pulse::Event<Args...>::EventConnection Event<Args...>::addListener(std::function<void(Args...)> fn) {
-		++_currentID;
-		Event<Args...>::EventConnection conn;
-		conn.connect(this, _currentID);
-		_listeners.push_back(std::make_pair(conn, std::move(fn)));
-		return conn;
 	}
 
 	template<typename ...Args>
@@ -79,13 +88,14 @@ namespace pulse
 	}
 
 	template<typename ...Args>
-	bool Event<Args...>::disconnectListener(int removeID)
+	bool Event<Args...>::disconnectListener(std::size_t removeID)
 	{
-		auto iter = std::remove_if(_listeners.begin(), _listeners.end(), [=](auto& pair) {
+		auto iter = std::remove_if(_listeners.begin(), _listeners.end(), [&](auto& pair) {
 			return (pair.first == removeID);
 			});
-		if(iter)
-			_listeners.erase(iter);
+
+		_listeners.erase(iter);
+		return true;
 	}
 
 

@@ -16,10 +16,16 @@
     <Filter Include="Header Files\pulse">
       <UniqueIdentifier>{6a50209f-b90f-4ef8-a102-f21fe7285de4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{c653148b-ace5-4b7f-a4d2-b00c10178453}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test\Foo.cpp">
+      <Filter>test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -28,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="include\pulse\message_bus.hpp">
       <Filter>Header Files\pulse</Filter>
+    </ClInclude>
+    <ClInclude Include="test\Foo.h">
+      <Filter>test</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

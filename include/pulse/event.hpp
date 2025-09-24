@@ -13,9 +13,13 @@ namespace pulse
 	template<typename ...Args>
 	class Event
 	{
-		using Func = std::function<void(Args...)>;
 
 	public:
+		using Func = std::function<void(Args...)>;
+
+		/// <summary>
+		/// EventConnection allows for manual disconnection (unregistering) from an event.
+		/// </summary>
 		class EventConnection
 		{
 		public:
@@ -38,6 +42,12 @@ namespace pulse
 			Event* _eventOwner = nullptr;
 		};
 
+		/// <summary>
+		/// Adds a listener to the event.
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="fn"></param>
+		/// <returns></returns>
 		template<typename ...Args>
 		EventConnection addListener(Func fn) {
 			++_currentID;
@@ -47,6 +57,12 @@ namespace pulse
 			return conn;
 		}
 
+		/// <summary>
+		/// Adds a listener to the event.
+		/// </summary>
+		/// <typeparam name="F"></typeparam>
+		/// <param name="f"></param>
+		/// <returns></returns>
 		template<class F>
 		EventConnection addListener(F&& f) {
 			const std::size_t id = ++_currentID;
@@ -55,55 +71,61 @@ namespace pulse
 			return c;
 		}
 
-		inline void invoke(const Args&... args);
-		inline void clear();
-		inline std::size_t count();
+		/// <summary>
+		/// invoke calls all methods associated with this Event.
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="...args"></param>
+		template<typename ...Args>
+		void invoke(const Args&... args) {
+			for (auto fn : _listeners) {
+				fn.second(args...);
+			}
+		}
 
+		/// <summary>
+		/// Clears the vector of listeners and sets current ID back to 0.
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		template<typename ...Args>
+		void clear() {
+			_listeners.clear();
+			_currentID = 0;
+		}
+
+		/// <summary>
+		/// Get the number of listeners to this event
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <returns></returns>
+		template<typename ...Args>
+		std::size_t count() {
+			return _listeners.size();
+		}
+
+		/// <summary>
+		/// This method removes a EventConnection from the listeners vector based on the provided id.  This is an internal function called by EventConnection::disconnect()
+		/// </summary>
+		/// <typeparam name="...Args"></typeparam>
+		/// <param name="removeID"></param>
+		/// <returns></returns>
+		template<typename ...Args>
+		bool disconnectListener(std::size_t removeID)
+		{
+			auto iter = std::remove_if(_listeners.begin(), _listeners.end(), [&](auto& pair) {
+				return (pair.first == removeID);
+				});
+
+			_listeners.erase(iter);
+			return true;
+		}
 
 	private:
 
-		bool disconnectListener(std::size_t removeID);
+		inline bool disconnectListener(std::size_t removeID);
 
 		std::vector <std::pair<std::size_t, Func>> _listeners;
 		std::size_t _currentID = 0;
 	};
-
-	// IMPLEMENTATION
-
-	/// <summary>
-	/// invoke calls all methods associated with this Event.
-	/// </summary>
-	/// <typeparam name="...Args"></typeparam>
-	/// <param name="...args"></param>
-	template<typename ...Args>
-	void Event<Args...>::invoke(const Args&... args) {
-		for (auto fn : _listeners) {
-			fn.second(args...);
-		}
-	}
-
-	template<typename ...Args>
-	void Event<Args...>::clear() {
-		_listeners.clear();
-		_currentID = 0;
-	}
-
-	template<typename ...Args>
-	std::size_t Event<Args...>::count() {
-		return _listeners.size();
-	}
-
-	template<typename ...Args>
-	bool Event<Args...>::disconnectListener(std::size_t removeID)
-	{
-		auto iter = std::remove_if(_listeners.begin(), _listeners.end(), [&](auto& pair) {
-			return (pair.first == removeID);
-			});
-
-		_listeners.erase(iter);
-		return true;
-	}
-
-
 }
 #endif

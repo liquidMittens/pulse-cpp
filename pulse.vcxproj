@@ -125,10 +125,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="test\Foo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pulse\event.hpp" />
     <ClInclude Include="include\pulse\message_bus.hpp" />
+    <ClInclude Include="test\Foo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

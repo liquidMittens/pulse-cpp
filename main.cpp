@@ -1,6 +1,7 @@
 // main entry
 #include "include/pulse/event.hpp"
 #include "include/pulse/message_bus.hpp"
+#include "test/Foo.h"
 #include <string>
 #include <iostream>
 #include <format>
@@ -40,8 +41,14 @@ int main(int argc, char* argv[])
 
 	std::cout << "\n\n";
 	std::cout << "-------------------------message_bus tests-------------------------\n";
+	std::cout << "Creating message (std::string)\n";
+	pulse::Message<std::string, std::string> strMessage("This is a strTopic!", "This is a string message!");
+	std::cout << strMessage << std::endl;
 
-
+	Foo temp;
+	temp.AddToNumber(10);
+	temp.AddToString("Hello World");
+	std::cout << temp << std::endl;
 
 	return 0;
 }

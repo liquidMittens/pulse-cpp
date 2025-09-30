@@ -3,6 +3,9 @@
 #include <string>
 #include <ostream>
 #include <format>
+#include "event.hpp"
+
+using namespace pulse;
 
 class Foo
 {
@@ -26,6 +29,7 @@ public:
 private: 
 	int _number;
 	std::string _name;
+	pulse::Event<std::string> helloWorldEvent;
 };
 
 

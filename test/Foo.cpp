@@ -21,7 +21,6 @@ void Foo::AddToNumber(const int& x)
 void Foo::AddToString(const std::string& str)
 {
 	_name.append(" ").append(str);
-	std::cout << "Holy shit its in the function!\n";
 }
 
 const std::string Foo::CombineNumberAndString()

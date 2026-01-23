@@ -25,7 +25,9 @@ int main(int argc, char* argv[])
 	pulse::Event<std::string>::EventConnection helloStringMethodConnection = helloStringEvent.addListener(helloString);
 	std::cout << "Added Listener to helloStringEvent (lambda)\n";
 	pulse::Event<std::string>::EventConnection helloStringLambdaConnection = helloStringEvent.addListener([](std::string s) { std::cout << std::format("This is from a lambda! It says: {}\n", s); });
-	pulse::Event<std::string>::EventConnection helloFooConnection = helloStringEvent.addListener(std::bind(&Foo::AddToString, fooTemp.get(), std::placeholders::_1));
+//	pulse::Event<std::string>::EventConnection helloFooConnection = helloStringEvent.addListener(std::bind(&Foo::AddToString, fooTemp.get(), std::placeholders::_1));
+	helloStringEvent.addListener(pulse::EventBinder::bind(fooTemp.get(), &Foo::AddToString));
+
 	std::cout << "Added Listener to helloIntEvent\n\n";
 	pulse::Event<int> helloIntEvent;
 	helloIntEvent.addListener(helloInt);

@@ -7,6 +7,29 @@
 namespace pulse
 {
 	/// <summary>
+	/// Wraps the std::bind call in a friendly name
+	/// </summary>
+	/// <typeparam name="Class"></typeparam>
+	/// <typeparam name="Arg"></typeparam>
+	class EventBinder
+	{
+	public:
+		template<typename Class, typename Ret, typename... Args>
+		static std::function<Ret(Args...)>	 bind(Class* obj, Ret(Class::* method)(Args...)) {
+			return [obj, method](Args... args) -> Ret {
+				std::invoke(method, obj, std::forward<Args>(args)...);
+				};
+		}
+
+		template<typename Class, typename Ret, typename... Args>
+		static std::function<Ret(Args...)>	 bind(const Class* obj, Ret(Class::*method)(Args...)) {
+			return [obj, method](Args... args) -> Ret {
+				std::invoke(method, obj, std::forward<Args>(args)...);
+				};
+		}
+	};
+
+	/// <summary>
 	/// Event class definition
 	/// </summary>
 	/// <typeparam name="...Args"></typeparam>
